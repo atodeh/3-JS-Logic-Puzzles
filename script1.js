@@ -1,90 +1,66 @@
 /******************************************************************Logic Challenge #1********************************************************************/
-const test = [1,2,4,591,44,392,391,2,5,10,2,1,1,1,20,20,44];
-//[1, 1, 1, 1, 2, 2, 2, 4, 5, 10, 20, 20, 391, 392, 591]
-//[[1,1,1,1],[2,2,2], 4,5,10,[20,20], 391, 392,591]
-const test2 = [56,52,1,8,9,8,6,4,5,7,6,3,2,5,9,8,4,1];
-//[1, 1, 2, 3, 4, 4, 5, 5, 6, 6, 7, 8, 8, 8, 9, 9, 52, 56]
-//[[1,1], 2, 3, [4,4], [5,5], [6,6], 7, [8,8,8], [9,9], 52, 56]
-const stringTest = [1, "2", 1, "3", 2];
-//[[1,1], 2, ["2", "3"]]
+const test = [1,2,4,591,392,391,2,5,10,2,1,1,1,20,20];
+//[[1,1,1,1],[2,2,2],4,5,10,[20,20],391,392,591]
+const stringTest = [2, 1, "2", 1, "3", 2];
+//[[1,1],[2,2],["2", "3"]]
+const finalTest = [1,"2","3",2,1,"2","3",2,1,"2","3",2,5,6,5,9,14,87];
+//[[1,1,1],[2,2,2],[5,5],6,9,14,87,["2","2","2","3","3","3"]]
 
-//this function sorts any given array numerically
-const sortArray = (arrayFromAbove) => {
-	return arrayFromAbove.sort(function(a, b) {
-		return a - b;
-	});	
-}
+//this is our main function that will sort our array to get the desired outcome
+const cleanTheRoom = array => {
+	array.sort((a, b) => a - b); //this will sort the passed array in order
 
-//this function will extract all string values from passed array, and return in a new array
-const stringArray = (array) => {
-	array = array.filter(item => (typeof item === 'string'));
-	return array;
-}
+	//we are creating a new array of just the numbers from the passed array
+	const numArray = array.filter(item => typeof item === "number");
+	//we are creating a new array of just the strings from the passed array
+	const stringArray = array.filter(item => typeof item === "string");
 
-//this function will return the final sorted array when called upon
-const answer = (answerFromAbove) => {
-	const newArray = sortArray(answerFromAbove); //calls sortArray function to sort any array passed through
-	let isString = false;
-	//check to see if passed array contains any string values
-	newArray.forEach((item, index) => {
-		if (typeof item === 'string') {
-			isString = true;
-		}
-	})
+	array = numArray; //assigning the number array to passed "array"
 
-//if the passed array does contain strings, we will call upon "stringArray" function to return array of strings
-	if (isString === true) {
-		var sArray = stringArray(newArray);
-		const sArrayLength = sArray.length;
-		for (var i = 0; i < newArray.length; i++) {
-			if (typeof newArray[i] === 'string') {
-				newArray[i] = false;
-			}
-		}
-		for (var i = 0; i < sArrayLength; i++) {
-			sArray[0] = [sArray[0]];
-			for (var i = 1; i < sArrayLength; i++) {
-				sArray[0].push(sArray[i]);
-				sArray[i] = false;
-		}}
-	}//end of if-statement for "isString"
+	var finalArray = []; //this finalArray is what our cleanTheRoom function will eventually return
+	var tempArray = []; //will hold any values that repeat
+	var placeHolder = array[0];
 
-//map function to create a "finalArray" that will sort through equal number values, and place them in nested arrays
-	let finalArray = newArray.map((item, index) => {
-		const length = newArray.length; //length of array
-		let placeHolder = newArray[index];; //holds first value of array we are checking
-		if (newArray[index] === newArray[index + 1] && newArray[index] !== false) {
-			newArray[index] = [newArray[index]]; //creating an array of same values
-			for (var i = 1; i < length; i++) {
-				if (placeHolder === newArray[i] && newArray[i] !== false) {
-					newArray[index].push(newArray[i]);	
-					newArray[i] = false;
-				}	
-			}
-			return newArray[index]; //returns value to map function
-		} else {
-			return item; //returns value to map function
-		}
-	})
-
-	//removing all false values in our array from above
-	for (var i = 0; i < finalArray.length; i++) {
-		if (finalArray[i] === false) {
-			finalArray.splice(i, 1)
-			i--;
-		} 
-	}
-//will return the desired array below depending on if string condition was met or not
-	if (isString) {
-		sArray = answer(sArray); //removing false values
-		return finalArray.concat(sArray);
+	//we are just checking the first and second value in the passed array to start off
+	if (array[0] === array[1]) {
+		tempArray.push(array[0]);
 	} else {
-		return finalArray; //returns the final array to be displayed when this function is called
+		finalArray.push(array[0]);
 	}
+	//we are simply checking through each element for matching values
+	for (var x = 1; x < array.length; x++) { 
+		if (placeHolder === array[x]) {
+			tempArray.push(array[x]);
+		} else {
+			if (tempArray.length > 0) {
+				finalArray.push(tempArray); //pushing array of matched values
+				tempArray = []; //clearing tempArray once it is pushed
+			}
+		if (array[x] !== array[x + 1] && array.length > x + 1) {
+			finalArray.push(array[x]);
+		} else if (array[x] === array[x + 1] && array.length > x + 1) {
+			tempArray.push(array[x]);
+		} else {
+			finalArray.push(array[x]);
+		}
+		placeHolder = array [x];
+		} //end of else statement
+		} //end of for loop
+
+	//adding matching values if they appear at the end of the array
+	if (tempArray.length > 0) {
+		finalArray.push(tempArray);
+	}
+	//adding string array into the final array, if string array exists
+	if (stringArray.length > 0) {
+		finalArray.push(stringArray);
+	} 
+
+	return finalArray; 
 }
 
 /*Test Examples*/
-console.log(answer(test)); //first test array pass through
-console.log(answer(test2)); //second test array pass through
-console.log(answer(stringTest)); //string test array pass through
+console.log(cleanTheRoom(test)); //first test array pass through
+console.log(cleanTheRoom(stringTest)); //string test array pass through
+console.log(cleanTheRoom(finalTest)); //final test array pass through
 
